@@ -1,0 +1,7 @@
+## Interface: 30000
+## Author: p3lim
+## Title: Scent
+## Notes: Replacement for the default buff frames
+
+Auras.lua
+Temporary.lua
