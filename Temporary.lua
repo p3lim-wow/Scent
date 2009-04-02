@@ -21,7 +21,7 @@ do
 	end
 end
 
-local mainhand = CreateFrame('Button', 'TempMainHandGlow', CharacterModelFrame, 'AutoCastShineTemplate')
+local mainhand = CreateFrame('Button', 'TempMainHandGlow', PaperDollFrame, 'AutoCastShineTemplate')
 mainhand:SetAllPoints(CharacterMainHandSlot)
 mainhand:SetScript('OnEvent', UpdateEnchant)
 mainhand:RegisterEvent('UNIT_INVENTORY_CHANGED')
@@ -33,7 +33,7 @@ mainhand.time:SetPoint('BOTTOMRIGHT')
 CharacterMainHandSlot:RegisterForClicks('AnyUp')
 
 
-local offhand = CreateFrame('Button', 'TempOffHandGlow', CharacterModelFrame, 'AutoCastShineTemplate')
+local offhand = CreateFrame('Button', 'TempOffHandGlow', PaperDollFrame, 'AutoCastShineTemplate')
 offhand:SetAllPoints(CharacterSecondaryHandSlot)
 offhand:SetScript('OnEvent', UpdateEnchant)
 offhand:RegisterEvent('UNIT_INVENTORY_CHANGED')
