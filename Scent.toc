@@ -1,4 +1,4 @@
-## Interface: 30000
+## Interface: 30100
 ## Author: p3lim
 ## Title: Scent
 ## Notes: Replacement for the default buff frames

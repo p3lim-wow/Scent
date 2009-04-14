@@ -25,25 +25,26 @@
 --]]
 
 local math_floor = math.floor
+local table_insert = table.insert
 
-local function OnEnter(self)
-	GameTooltip:SetOwner(self, 'ANCHOR_NONE')
-	GameTooltip:SetPoint('TOPRIGHT', self, 'BOTTOMLEFT', -1, 0)
+local function onEnter(self)
+	if(not self:IsVisible()) then return end
+
+	GameTooltip:SetOwner(self, 'ANCHOR_BOTTOMLEFT')
 	GameTooltip:SetUnitAura('player', self:GetID(), self.filter)
-	GameTooltip:Show()
 end
 
-local function OnLeave()
+local function onLeave()
 	GameTooltip:Hide()
 end
 
-local function OnMouseUp(self, button)
+local function onMouseUp(self, button)
 	if(button == 'RightButton') then
 		CancelUnitBuff('player', self:GetID(), self.filter)
 	end
 end
 
-local function OnUpdate(self)
+local function timeUpdate(self)
 	if(self.expiration) then
 		local timeleft = math_floor(self.expiration - GetTime() + 0.5)
 		if(timeleft < 90) then
@@ -56,16 +57,15 @@ local function OnUpdate(self)
 	end
 end
 
-local function CreateAura(self, index, filter)
+local function create(self, index)
 	local button = CreateFrame('Frame', nil, self)
 	button:EnableMouse(true)
 	button:SetWidth(28)
 	button:SetHeight(28)
-	button.filter = filter
 
-	button:SetScript('OnEnter', OnEnter)
-	button:SetScript('OnLeave', OnLeave)
-	button:SetScript('OnMouseUp', OnMouseUp)
+	button:SetScript('OnEnter', onEnter)
+	button:SetScript('OnLeave', onLeave)
+	button:SetScript('OnMouseUp', onMouseUp)
 
 	button.icon = button:CreateTexture(nil, 'BACKGROUND')
 	button.icon:SetAllPoints(button)
@@ -86,27 +86,28 @@ local function CreateAura(self, index, filter)
 	button.overlay:SetTexture([=[Interface\AddOns\Scent\media\CaithBorder]=])
 	button.overlay:SetAllPoints(border)
 
-	table.insert(self, button)
+	table_insert(self, button)
 
 	return button
 end
 
-local function UpdateAura(self, index, filter)
-	local name, rank, icon, count, dtype, _, expiration, owned = UnitAura('player', index, filter)
+local function update(self, index, filter)
+	local name, rank, icon, count, dtype, _, expiration, caster = UnitAura('player', index, filter)
 	local button = self[index]
 
 	if(name) then
-		if(not button) then button = CreateAura(self, index, filter) end
+		if(not button) then button = create(self, index) end
 
 		button:Show()
 		button:SetID(index)
 		button.icon:SetTexture(icon)
 		button.count:SetText(count > 1 and count)
+		button.filter = filter
 
 		if(expiration and expiration > 0) then
 			button.time:Show()
 			button.expiration = expiration
-			button:SetScript('OnUpdate', OnUpdate)
+			button:SetScript('OnUpdate', timeUpdate)
 		else
 			button.time:Hide()
 		end
@@ -115,7 +116,7 @@ local function UpdateAura(self, index, filter)
 			local color = DebuffTypeColor[dtype or 'none']
 			button.overlay:SetVertexColor(color.r, color.g, color.b)
 		else
-			if(owned) then
+			if((UnitHasVehicleUI('player') and caster == 'vehicle') or caster == 'player') then
 				button.overlay:SetVertexColor(0, 0.75, 1)
 			else
 				button.overlay:SetVertexColor(0.25, 0.25, 0.25)
@@ -128,7 +129,7 @@ local function UpdateAura(self, index, filter)
 	end
 end
 
-local function PositionAura(self, max)
+local function pos(self, max)
 	if(self and max > 0) then
 		local num, col, row = 11, 0, 0
 
@@ -149,11 +150,11 @@ local function PositionAura(self, max)
 	end
 end
 
-local function InitAura(self, filter)
+local function init(self, filter)
 	local max = (filter == 'HELPFUL') and 32 or 40
 	local visible = 0
 	for index = 1, max do
-		if(not UpdateAura(self, index, filter)) then
+		if(not update(self, index, filter)) then
 			max = index - 1
 
 			while(self[index]) do
@@ -166,7 +167,7 @@ local function InitAura(self, filter)
 		visible = visible + 1
 	end
 
-	PositionAura(self, max)
+	pos(self, max)
 end
 
 local function check(event, unit)
@@ -178,7 +179,7 @@ local buff = CreateFrame('Frame', nil, UIParent)
 buff:SetPoint('TOPRIGHT', UIParent, -185, -18)
 buff:SetHeight(110)
 buff:SetWidth(400)
-buff:SetScript('OnEvent', function(self, ...) if(check(...)) then InitAura(self, 'HELPFUL') end end)
+buff:SetScript('OnEvent', function(self, ...) if(check(...)) then init(self, 'HELPFUL') end end)
 buff:RegisterEvent('UNIT_AURA')
 buff:RegisterEvent('PLAYER_LOGIN')
 
@@ -186,10 +187,11 @@ local debuff = CreateFrame('Frame', nil, UIParent)
 debuff:SetPoint('TOPRIGHT', buff, 'BOTTOMRIGHT', 0, -15)
 debuff:SetHeight(150)
 debuff:SetWidth(400)
-debuff:SetScript('OnEvent', function(self, ...) if(check(...)) then InitAura(self, 'HARMFUL') end end)
+debuff:SetScript('OnEvent', function(self, ...) if(check(...)) then init(self, 'HARMFUL') end end)
 debuff:RegisterEvent('UNIT_AURA')
 debuff:RegisterEvent('PLAYER_LOGIN')
 
 BuffFrame:Hide()
 BuffFrame:UnregisterEvent("UNIT_AURA")
 TicketStatusFrame:EnableMouse(false)
+TicketStatusFrame:SetFrameStrata('BACKGROUND')
