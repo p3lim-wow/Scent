@@ -1,48 +1,57 @@
-local function UpdateEnchant(self, event, unit)
-	if(event == 'UNIT_INVENTORY_CHANGED' and unit ~= 'player') then return end
-
-	local name = self:GetName()
-	local main, _, _, off = GetWeaponEnchantInfo()
-	if((name:find('Main') and main) or (name:find('Off') and off)) then
-		AutoCastShine_AutoCastStart(self, 0.5, 0, 0.5)
-	else
-		AutoCastShine_AutoCastStop(self)
-	end
-end
+local id2id = { [16] = 1, [17] = 2 }
 
 do
 	local orig = PaperDollItemSlotButton_OnModifiedClick
-	function PaperDollItemSlotButton_OnModifiedClick(self, button)
-		if(IsAltKeyDown() and button == 'RightButton') then
-			CancelItemTempEnchantment(self:GetID() == 16 and 1 or self:GetID() == 17 and 2)
+	function PaperDollItemSlotButton_OnModifiedClick(self, button, ...)
+		if(IsShiftKeyDown() and button == 'LeftButton' and id2id[self:GetID()]) then
+			CancelItemTempEnchantment(id2id[self:GetID()])
 		else
-			orig(self, button)
+			orig(self, button, ...)
 		end
 	end
 end
 
-local mainhand = CreateFrame('Button', 'TempMainHandGlow', PaperDollFrame, 'AutoCastShineTemplate')
-mainhand:SetAllPoints(CharacterMainHandSlot)
-mainhand:SetScript('OnEvent', UpdateEnchant)
-mainhand:RegisterEvent('UNIT_INVENTORY_CHANGED')
-mainhand:RegisterEvent('PLAYER_LOGIN')
-mainhand:EnableMouse(false)
-
-mainhand.time = mainhand:CreateFontString(nil, 'OVERLAY', 'GameFontHighlight')
-mainhand.time:SetPoint('BOTTOMRIGHT')
 CharacterMainHandSlot:RegisterForClicks('AnyUp')
+local m = CreateFrame('Frame', 'ScentMainShine', CharacterMainHandSlot, 'AutoCastShineTemplate')
+m:SetAllPoints(CharacterMainHandSlot)
+m:RegisterEvent('UNIT_INVENTORY_CHANGED')
+m:RegisterEvent('PLAYER_LOGIN')
+m:SetScript('OnEvent', function(self, event, unit)
+	if(unit and unit ~= 'player') then return end
 
+	local active = GetWeaponEnchantInfo()
+	if(active) then
+		AutoCastShine_AutoCastStart(self, 0.5, 0, 0.5)
+	else
+		AutoCastShine_AutoCastStop(self)
+	end
+end)
 
-local offhand = CreateFrame('Button', 'TempOffHandGlow', PaperDollFrame, 'AutoCastShineTemplate')
-offhand:SetAllPoints(CharacterSecondaryHandSlot)
-offhand:SetScript('OnEvent', UpdateEnchant)
-offhand:RegisterEvent('UNIT_INVENTORY_CHANGED')
-offhand:RegisterEvent('PLAYER_LOGIN')
-offhand:EnableMouse(false)
-
-offhand.time = offhand:CreateFontString(nil, 'OVERLAY', 'GameFontHighlight')
-offhand.time:SetPoint('BOTTOMRIGHT')
 CharacterSecondaryHandSlot:RegisterForClicks('AnyUp')
+local o = CreateFrame('Frame', 'ScentOffShine', CharacterSecondaryHandSlot, 'AutoCastShineTemplate')
+o:SetAllPoints(CharacterSecondaryHandSlot)
+o:RegisterEvent('UNIT_INVENTORY_CHANGED')
+o:RegisterEvent('PLAYER_LOGIN')
+o:SetScript('OnEvent', function(self, event, unit)
+	if(unit and unit ~= 'player') then return end
+
+	local _, _, _, active = GetWeaponEnchantInfo()
+	if(active) then
+		AutoCastShine_AutoCastStart(self, 0.5, 0, 0.5)
+	else
+		AutoCastShine_AutoCastStop(self)
+	end
+end)
 
 TemporaryEnchantFrame:Hide()
 TemporaryEnchantFrame:SetScript('OnUpdate', nil)
+
+for key, value in next, m.sparkles do
+	value:SetWidth(value:GetWidth() * 3)
+	value:SetHeight(value:GetHeight() * 3)
+end
+
+for key, value in next, o.sparkles do
+	value:SetWidth(value:GetWidth() * 3)
+	value:SetHeight(value:GetHeight() * 3)
+end
