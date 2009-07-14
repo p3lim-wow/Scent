@@ -1,3 +1,14 @@
+--[[
+
+	Copyright (c) 2009 Adrian L Lange <adrianlund@gmail.com>
+	All rights reserved.
+
+	You're allowed to use this addon, free of monetary charge,
+	but you are not allowed to modify, alter, or redistribute
+	this addon without express, written permission of the author.
+
+--]]
+
 local id2id = { [16] = 1, [17] = 2 }
 
 do
