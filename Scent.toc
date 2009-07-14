@@ -2,6 +2,7 @@
 ## Author: p3lim
 ## Title: Scent
 ## Notes: Replacement for the default buff frames
+## RequiredDeps: oUF
 
 Auras.lua
 Temporary.lua
