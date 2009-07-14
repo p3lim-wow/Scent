@@ -38,13 +38,12 @@ local function createBorder(parent, index)
 	dummy:SetScript('OnEvent', onEvent)
 end
 
-local id2id = { [16] = 1, [17] = 2 }
-
 do
+	local id = {[16] = 1, [17] = 2}
 	local orig = PaperDollItemSlotButton_OnModifiedClick
 	function PaperDollItemSlotButton_OnModifiedClick(self, button, ...)
-		if(IsShiftKeyDown() and button == 'LeftButton' and id2id[self:GetID()]) then
-			CancelItemTempEnchantment(id2id[self:GetID()])
+		if(IsShiftKeyDown() and button == 'LeftButton' and id[self:GetID()]) then
+			CancelItemTempEnchantment(id[self:GetID()])
 		else
 			orig(self, button, ...)
 		end
