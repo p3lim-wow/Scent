@@ -9,6 +9,35 @@
 
 --]]
 
+local function onEvent(self, event, unit)
+	if(unit and unit ~= 'player') then return end
+
+	local main, _, _, off = GetWeaponEnchantInfo()
+	if(self.index == 1 and main) then
+		self.texture:Show()
+	elseif(self.index == 2 and off) then
+		self.texture:Show()
+	else
+		self.texture:Hide()
+	end
+end
+
+local function createBorder(parent, index)
+	local texture = parent:CreateTexture(nil, 'OVERLAY')
+	texture:SetTexture([=[Interface\Buttons\UI-Button-Outline]=])
+	texture:SetVertexColor(1/2, 0, 1/2)
+	texture:SetBlendMode('ADD')
+	texture:SetPoint('TOPRIGHT', parent, 15, 15)
+	texture:SetPoint('BOTTOMLEFT', parent, -15, -15)
+
+	local dummy = CreateFrame('Frame')
+	dummy.index = index
+	dummy.texture = texture
+	dummy:RegisterEvent('UNIT_INVENTORY_CHANGED')
+	dummy:RegisterEvent('PLAYER_LOGIN')
+	dummy:SetScript('OnEvent', onEvent)
+end
+
 local id2id = { [16] = 1, [17] = 2 }
 
 do
@@ -22,49 +51,8 @@ do
 	end
 end
 
-CharacterMainHandSlot:RegisterForClicks('AnyUp')
-local m = CreateFrame('Frame', 'ScentMainShine', CharacterMainHandSlot, 'AutoCastShineTemplate')
-m.t = m:CreateTexture(nil, 'OVERLAY')
-m.t:SetTexture([=[Interface\Buttons\UI-Button-Outline]=])
-m.t:SetVertexColor(1/2, 0, 1/2)
-m.t:SetBlendMode('ADD')
-m.t:SetPoint('TOPRIGHT', m, 15, 15)
-m.t:SetPoint('BOTTOMLEFT', m, -15, -15)
-m:SetAllPoints(CharacterMainHandSlot)
-m:RegisterEvent('UNIT_INVENTORY_CHANGED')
-m:RegisterEvent('PLAYER_LOGIN')
-m:SetScript('OnEvent', function(self, event, unit)
-	if(unit and unit ~= 'player') then return end
-
-	local active = GetWeaponEnchantInfo()
-	if(active) then
-		self.t:Show()
-	else
-		self.t:Hide()
-	end
-end)
-
-CharacterSecondaryHandSlot:RegisterForClicks('AnyUp')
-local o = CreateFrame('Frame', 'ScentOffShine', CharacterSecondaryHandSlot, 'AutoCastShineTemplate')
-o.t = o:CreateTexture(nil, 'OVERLAY')
-o.t:SetTexture([=[Interface\Buttons\UI-Button-Outline]=])
-o.t:SetVertexColor(1/2, 0, 1/2)
-o.t:SetBlendMode('ADD')
-o.t:SetPoint('TOPRIGHT', o, 15, 15)
-o.t:SetPoint('BOTTOMLEFT', o, -15, -15)
-o:SetAllPoints(CharacterSecondaryHandSlot)
-o:RegisterEvent('UNIT_INVENTORY_CHANGED')
-o:RegisterEvent('PLAYER_LOGIN')
-o:SetScript('OnEvent', function(self, event, unit)
-	if(unit and unit ~= 'player') then return end
-
-	local _, _, _, active = GetWeaponEnchantInfo()
-	if(active) then
-		self.t:Show()
-	else
-		self.t:Hide()
-	end
-end)
+createBorder(CharacterMainHandSlot, 1)
+createBorder(CharacterSecondaryHandSlot, 2)
 
 TemporaryEnchantFrame:Hide()
 TemporaryEnchantFrame:SetScript('OnUpdate', nil)
