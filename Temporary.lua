@@ -24,6 +24,12 @@ end
 
 CharacterMainHandSlot:RegisterForClicks('AnyUp')
 local m = CreateFrame('Frame', 'ScentMainShine', CharacterMainHandSlot, 'AutoCastShineTemplate')
+m.t = m:CreateTexture(nil, 'OVERLAY')
+m.t:SetTexture([=[Interface\Buttons\UI-Button-Outline]=])
+m.t:SetVertexColor(1/2, 0, 1/2)
+m.t:SetBlendMode('ADD')
+m.t:SetPoint('TOPRIGHT', m, 15, 15)
+m.t:SetPoint('BOTTOMLEFT', m, -15, -15)
 m:SetAllPoints(CharacterMainHandSlot)
 m:RegisterEvent('UNIT_INVENTORY_CHANGED')
 m:RegisterEvent('PLAYER_LOGIN')
@@ -32,14 +38,20 @@ m:SetScript('OnEvent', function(self, event, unit)
 
 	local active = GetWeaponEnchantInfo()
 	if(active) then
-		AutoCastShine_AutoCastStart(self, 0.5, 0, 0.5)
+		self.t:Show()
 	else
-		AutoCastShine_AutoCastStop(self)
+		self.t:Hide()
 	end
 end)
 
 CharacterSecondaryHandSlot:RegisterForClicks('AnyUp')
 local o = CreateFrame('Frame', 'ScentOffShine', CharacterSecondaryHandSlot, 'AutoCastShineTemplate')
+o.t = o:CreateTexture(nil, 'OVERLAY')
+o.t:SetTexture([=[Interface\Buttons\UI-Button-Outline]=])
+o.t:SetVertexColor(1/2, 0, 1/2)
+o.t:SetBlendMode('ADD')
+o.t:SetPoint('TOPRIGHT', o, 15, 15)
+o.t:SetPoint('BOTTOMLEFT', o, -15, -15)
 o:SetAllPoints(CharacterSecondaryHandSlot)
 o:RegisterEvent('UNIT_INVENTORY_CHANGED')
 o:RegisterEvent('PLAYER_LOGIN')
@@ -48,21 +60,11 @@ o:SetScript('OnEvent', function(self, event, unit)
 
 	local _, _, _, active = GetWeaponEnchantInfo()
 	if(active) then
-		AutoCastShine_AutoCastStart(self, 0.5, 0, 0.5)
+		self.t:Show()
 	else
-		AutoCastShine_AutoCastStop(self)
+		self.t:Hide()
 	end
 end)
 
 TemporaryEnchantFrame:Hide()
 TemporaryEnchantFrame:SetScript('OnUpdate', nil)
-
-for key, value in next, m.sparkles do
-	value:SetWidth(value:GetWidth() * 3)
-	value:SetHeight(value:GetHeight() * 3)
-end
-
-for key, value in next, o.sparkles do
-	value:SetWidth(value:GetWidth() * 3)
-	value:SetHeight(value:GetHeight() * 3)
-end
