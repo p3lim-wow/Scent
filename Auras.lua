@@ -35,31 +35,26 @@ local function postCreate(self, button, icons)
 	button:HookScript('OnEnter', hookTooltip)
 end
 
-local function updateTime(self)
-	if(self.expiration) then
-		local timeleft = floor(self.expiration - GetTime() + 0.5)
-		self.time:SetText(timeleft < 90 and timeleft > 0 and timeleft or '')
-	else
-		self:SetScript('OnUpdate', nil)
+local function updateTime(self, elapsed)
+	self.timeLeft = max(self.timeLeft - elapsed, 0)
+	self.time:SetText(self.timeLeft < 90 and floor(self.timeLeft) or '')
+	
+	if(GameTooltip:IsOwned(self)) then
+		GameTooltip:SetUnitAura(self.frame.unit, self:GetID(), self.filter)
+		hookTooltip(self)
 	end
 end
 
 local function postUpdate(self, icons, unit, icon, index)
-	local _, _, _, _, dtype, _, expiration, caster = UnitAura(unit, index, icon.filter)
-	if(expiration and expiration > 0) then
-		icon.expiration = expiration
-		icon:SetScript('OnUpdate', updateTime)
-	end
+	local _, _, _, _, _, duration, expiration = UnitAura(unit, index, icon.filter)
 
-	if(icon.filter == 'HARMFUL') then
-		local color = DebuffTypeColor[dtype or 'none']
-		icon.overlay:SetVertexColor(color.r, color.g, color.b)
+	if(duration > 0 and expiration) then
+		icon.timeLeft = expiration - GetTime()
+		icon:SetScript('OnUpdate', updateTime)
 	else
-		if((UnitHasVehicleUI('player') and caster == 'vehicle') or caster == 'player') then
-			icon.overlay:SetVertexColor(0, 0.75, 1)
-		else
-			icon.overlay:SetVertexColor(0.25, 0.25, 0.25)
-		end
+		icon.timeLeft = nil
+		icon.time:SetText()
+		icon:SetScript('OnUpdate', nil)
 	end
 end
 
