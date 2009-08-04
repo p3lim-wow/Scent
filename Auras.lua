@@ -9,8 +9,23 @@
 
 --]]
 
+local match, format, gsub = string.match, string.format, string.gsub
+
 local function hookTooltip(self)
-	GameTooltip:AddLine(format('Casted by %s', self.owner and UnitName(self.owner) or UNKNOWN))
+	if(self.owner) then
+		if(self.owner == 'vehicle' or self.owner == 'pet') then
+			GameTooltip:AddLine(format('Cast by %s <%s>', UnitName(self.owner), UnitName('player')))
+		elseif(self.owner:match('^partypet[1-4]$')) then
+			GameTooltip:AddLine(format('Cast by %s <%s>', UnitName(self.owner), UnitName(format('party%d', self.owner:gsub('^partypet(%d)$', '%1')))))
+		elseif(self.owner:match('^raidpet[1-40]$')) then
+			GameTooltip:AddLine(format('Cast by %s <%s>', UnitName(self.owner), UnitName(format('raid%d', self.owner:gsub('^raidpet(%d)$', '%1')))))
+		else
+			GameTooltip:AddLine(format('Cast by %s', UnitName(self.owner)))
+		end
+	else
+		GameTooltip:AddLine(format('Cast by %s', UNKNOWN))
+	end
+
 	GameTooltip:Show()
 end
 
