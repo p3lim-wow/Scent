@@ -1,5 +1,6 @@
-## Interface: 30100
+## Interface: 30200
 ## Author: p3lim
+## Version: Alpha
 ## Title: Scent
 ## Notes: Replacement for the default buff frames
 ## RequiredDeps: oUF
