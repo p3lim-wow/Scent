@@ -18,6 +18,7 @@ local buffFilter = {
 	[GetSpellInfo(62600)] = true,
 }
 
+local floor, max = math.floor, math.max
 local match, format, gsub = string.match, string.format, string.gsub
 
 local function hookTooltip(self)
@@ -36,6 +37,27 @@ local function hookTooltip(self)
 	end
 
 	GameTooltip:Show()
+end
+
+local function setPosition(self, icons, maxIcons)
+	if(icons and maxIcons > 0) then
+		local col, cols = 0, floor(400 / 36 + 0.5)
+		local row, rows = 0, floor(110 / 36 + 0.5)
+
+		for index = 1, maxIcons do
+			local button = icons[index]
+			if(button and button:IsShown()) then
+				if(col >= cols) then
+					col = 0
+					row = row + 1
+				end
+
+				button:ClearAllPoints('TOPRIGHT', icons, 'TOPRIGHT', col * 36 * -1, row * 36 * -1)
+
+				col = col + 1
+			end
+		end
+	end
 end
 
 local function postCreate(self, button, icons)
@@ -93,24 +115,16 @@ local function style(self, unit)
 	self.Buffs:SetPoint('TOPRIGHT', UIParent, -185, -18)
 	self.Buffs:SetHeight(110)
 	self.Buffs:SetWidth(400)
-	self.Buffs.size = 28
-	self.Buffs.spacing = 8
-	self.Buffs.initialAnchor = 'TOPRIGHT'
-	self.Buffs['growth-y'] = 'DOWN'
-	self.Buffs['growth-x'] = 'LEFT'
+	self.SetAuraPosition = setPosition
 	self.PostCreateAuraIcon = postCreate
 	self.PostUpdateAuraIcon = postUpdate
 	self.CustomAuraFilter = customFilter
 
 	self.Debuffs = CreateFrame('Frame', nil, self)
 	self.Debuffs:SetPoint('TOPRIGHT', self.Buffs, 'BOTTOMRIGHT', 0, -15)
-	self.Debuffs:SetHeight(150)
+	self.Debuffs:SetHeight(110)
 	self.Debuffs:SetWidth(400)
-	self.Debuffs.size = 28
-	self.Debuffs.spacing = 8
-	self.Debuffs.initialAnchor = 'TOPRIGHT'
-	self.Debuffs['growth-y'] = 'DOWN'
-	self.Debuffs['growth-x'] = 'LEFT'
+	self.SetAuraPosition = setPosition
 	self.PostCreateAuraIcon = postCreate
 	self.PostUpdateAuraIcon = postUpdate
 
