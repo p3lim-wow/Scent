@@ -52,7 +52,8 @@ local function setPosition(self, icons, maxIcons)
 					row = row + 1
 				end
 
-				button:ClearAllPoints('TOPRIGHT', icons, 'TOPRIGHT', col * 36 * -1, row * 36 * -1)
+				button:ClearAllPoints()
+				button:SetPoint('TOPRIGHT', icons, 'TOPRIGHT', col * 36 * -1, row * 36 * -1)
 
 				col = col + 1
 			end
