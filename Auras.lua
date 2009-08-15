@@ -135,6 +135,6 @@ local function style(self, unit)
 	TicketStatusFrame:SetFrameStrata('BACKGROUND')
 end
 
-oUF:RegisterStyle('P3limAuras', style)
-oUF:SetActiveStyle('P3limAuras')
+oUF:RegisterStyle('Scent', style)
+oUF:SetActiveStyle('Scent')
 oUF:Spawn('player') -- dummy
