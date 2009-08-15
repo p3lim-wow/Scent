@@ -129,7 +129,7 @@ local function style(self, unit)
 	self.PostUpdateAuraIcon = postUpdate
 
 	BuffFrame:Hide()
-	BuffFrame:UnregisterEvent("UNIT_AURA")
+	BuffFrame:UnregisterEvent('UNIT_AURA')
 
 	TicketStatusFrame:EnableMouse(false)
 	TicketStatusFrame:SetFrameStrata('BACKGROUND')
