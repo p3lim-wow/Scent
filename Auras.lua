@@ -9,6 +9,15 @@
 
 --]]
 
+local buffFilter = {
+	[GetSpellInfo(61336)] = true,
+	[GetSpellInfo(22842)] = true,
+	[GetSpellInfo(52610)] = true,
+	[GetSpellInfo(22812)] = true,
+	[GetSpellInfo(16870)] = true,
+	[GetSpellInfo(62600)] = true,
+}
+
 local match, format, gsub = string.match, string.format, string.gsub
 
 local function hookTooltip(self)
@@ -70,6 +79,12 @@ local function postUpdate(self, icons, unit, icon, index)
 		icon.timeLeft = nil
 		icon.time:SetText()
 		icon:SetScript('OnUpdate', nil)
+	end
+end
+
+local function customFilter(icons, unit, icon, name, rank, texture, count, dtype, duration, expiration, caster)
+	if(not (buffFilter[name] and caster == 'player')) then
+		return true
 	end
 end
 
