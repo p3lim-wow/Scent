@@ -41,8 +41,8 @@ end
 
 local function setPosition(self, icons, maxIcons)
 	if(icons and maxIcons > 0) then
-		local col, cols = 0, floor(400 / 36 + 0.5)
-		local row, rows = 0, floor(110 / 36 + 0.5)
+		local col, cols = 0, floor(400 / 34 + 0.5)
+		local row, rows = 0, floor(110 / 34 + 0.5)
 
 		for index = 1, maxIcons do
 			local button = icons[index]
@@ -53,7 +53,7 @@ local function setPosition(self, icons, maxIcons)
 				end
 
 				button:ClearAllPoints()
-				button:SetPoint('TOPRIGHT', icons, 'TOPRIGHT', col * 36 * -1, row * 36 * -1)
+				button:SetPoint('TOPRIGHT', icons, 'TOPRIGHT', col * 34 * -1, row * 34 * -1)
 
 				col = col + 1
 			end
@@ -65,16 +65,11 @@ local function postCreate(self, button, icons)
 	icons.showDebuffType = true
 	icons.disableCooldown = true
 
-	local border = button:CreateTexture(nil, 'BORDER')
-	border:SetTexture([=[Interface\AddOns\Scent\media\CaithNormal]=])
-	border:SetPoint('TOPLEFT', button, -2, 2)
-	border:SetPoint('BOTTOMRIGHT', button, 2, -2)
-	border:SetVertexColor(0.25, 0.25, 0.25)
-
-	button.overlay:SetDrawLayer('ARTWORK')
-	button.overlay:SetTexture([=[Interface\AddOns\Scent\media\CaithBorder]=])
-	button.overlay:SetAllPoints(border)
-	button.overlay:SetTexCoord(0, 1, 0, 1)
+	button:SetBackdrop({bgFile = [=[Interface\ChatFrame\ChatFrameBackground]=], insets = {top = -1, bottom = -1, left = -1, right = -1}})
+	button:SetBackdropColor(0, 0, 0)
+	button.icon:SetTexCoord(0.06, 0.94, 0.06, 0.94)
+	button.icon:SetDrawLayer('ARTWORK')
+	button.overlay:SetTexture()
 
 	button.time = button:CreateFontString(nil, 'OVERLAY', 'NumberFontNormal')
 	button.time:SetPoint('TOPLEFT', button)
@@ -93,15 +88,22 @@ local function updateTime(self, elapsed)
 end
 
 local function postUpdate(self, icons, unit, icon, index)
-	local _, _, _, _, _, duration, expiration = UnitAura(unit, index, icon.filter)
+	local _, _, _, _, dtype, duration, expiration = UnitAura(unit, index, icon.filter)
 
-	if(duration > 0 and expiration) then
+	if(duration and duration > 0 and expiration) then
 		icon.timeLeft = expiration - GetTime()
 		icon:SetScript('OnUpdate', updateTime)
 	else
 		icon.timeLeft = nil
 		icon.time:SetText()
 		icon:SetScript('OnUpdate', nil)
+	end
+
+	if(icon.debuff) then
+		local color = DebuffTypeColor[dtype] or DebuffTypeColor.none
+		icon:SetBackdropColor(color.r * 0.3, color.g * 0.3, color.b * 0.3)
+	else
+		icon:SetBackdropColor(0, 0, 0)
 	end
 end
 
@@ -111,20 +113,22 @@ local function customFilter(icons, unit, icon, name, rank, texture, count, dtype
 	end
 end
 
-local function style(self, unit)
-	self.Buffs = CreateFrame('Frame', nil, self)
-	self.Buffs:SetPoint('TOPRIGHT', UIParent, -185, -18)
+local function style(self)
+	self.Buffs = CreateFrame('Frame', nil, UIParent)
+	self.Buffs:SetPoint('TOPRIGHT', Minimap, 'TOPLEFT', -30, 0)
 	self.Buffs:SetHeight(110)
 	self.Buffs:SetWidth(400)
+	self.Buffs.size = 26
 	self.SetAuraPosition = setPosition
 	self.PostCreateAuraIcon = postCreate
 	self.PostUpdateAuraIcon = postUpdate
 	self.CustomAuraFilter = customFilter
 
-	self.Debuffs = CreateFrame('Frame', nil, self)
+	self.Debuffs = CreateFrame('Frame', nil, UIParent)
 	self.Debuffs:SetPoint('TOPRIGHT', self.Buffs, 'BOTTOMRIGHT', 0, -15)
 	self.Debuffs:SetHeight(110)
 	self.Debuffs:SetWidth(400)
+	self.Debuffs.size = 26
 	self.SetAuraPosition = setPosition
 	self.PostCreateAuraIcon = postCreate
 	self.PostUpdateAuraIcon = postUpdate
