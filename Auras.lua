@@ -79,7 +79,7 @@ local function postUpdate(self, icons, unit, icon, index)
 
 	if(icon.debuff) then
 		local color = DebuffTypeColor[dtype] or DebuffTypeColor.none
-		icon:SetBackdropColor(color.r * 0.3, color.g * 0.3, color.b * 0.3)
+		icon:SetBackdropColor(color.r * 0.6, color.g * 0.6, color.b * 0.6)
 	else
 		icon:SetBackdropColor(0, 0, 0)
 	end
