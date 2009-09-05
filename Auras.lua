@@ -85,8 +85,9 @@ local function postUpdate(self, icons, unit, icon, index)
 	end
 end
 
-local function customFilter(icons, unit, icon, name, rank, texture, count, dtype, duration, expiration, caster)
-	if(not (buffFilter[name] and caster == 'player')) then
+local function customFilter(icons, unit, icon, name, rank, texture, count, dtype, duration, expiration, owner)
+	if(not (buffFilter[name] and owner == 'player')) then
+		icon.owner = owner
 		return true
 	end
 end
