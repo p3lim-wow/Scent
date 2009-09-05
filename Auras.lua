@@ -39,28 +39,6 @@ local function hookTooltip(self)
 	GameTooltip:Show()
 end
 
-local function setPosition(self, icons, maxIcons)
-	if(icons and maxIcons > 0) then
-		local col, cols = 0, floor(400 / 34 + 0.5)
-		local row, rows = 0, floor(110 / 34 + 0.5)
-
-		for index = 1, maxIcons do
-			local button = icons[index]
-			if(button and button:IsShown()) then
-				if(col >= cols) then
-					col = 0
-					row = row + 1
-				end
-
-				button:ClearAllPoints()
-				button:SetPoint('TOPRIGHT', icons, 'TOPRIGHT', col * 34 * -1, row * 34 * -1)
-
-				col = col + 1
-			end
-		end
-	end
-end
-
 local function postCreate(self, button, icons)
 	icons.showDebuffType = true
 	icons.disableCooldown = true
@@ -119,7 +97,10 @@ local function style(self)
 	self.Buffs:SetHeight(110)
 	self.Buffs:SetWidth(400)
 	self.Buffs.size = 26
-	self.SetAuraPosition = setPosition
+	self.Buffs.spacing = 12
+	self.Buffs.initialAnchor = 'TOPRIGHT'
+	self.Buffs['growth-x'] = 'LEFT'
+	self.Buffs['growth-y'] = 'DOWN'
 	self.PostCreateAuraIcon = postCreate
 	self.PostUpdateAuraIcon = postUpdate
 	self.CustomAuraFilter = customFilter
@@ -129,7 +110,10 @@ local function style(self)
 	self.Debuffs:SetHeight(110)
 	self.Debuffs:SetWidth(400)
 	self.Debuffs.size = 26
-	self.SetAuraPosition = setPosition
+	self.Debuffs.spacing = 12
+	self.Debuffs.initialAnchor = 'TOPRIGHT'
+	self.Debuffs['growth-x'] = 'LEFT'
+	self.Debuffs['growth-y'] = 'DOWN'
 	self.PostCreateAuraIcon = postCreate
 	self.PostUpdateAuraIcon = postUpdate
 
