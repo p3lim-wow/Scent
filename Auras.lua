@@ -10,12 +10,11 @@
 --]]
 
 local buffFilter = {
-	[GetSpellInfo(61336)] = true,
-	[GetSpellInfo(22842)] = true,
-	[GetSpellInfo(52610)] = true,
-	[GetSpellInfo(22812)] = true,
-	[GetSpellInfo(16870)] = true,
-	[GetSpellInfo(62600)] = true,
+	[GetSpellInfo(52610)] = true, -- Savage Roar
+	[GetSpellInfo(22812)] = true, -- Barkskin
+	[GetSpellInfo(16870)] = true, -- Clearcast
+	[GetSpellInfo(50334)] = true, -- Berserk
+	[GetSpellInfo(50213)] = true, -- Tiger's Fury
 }
 
 local floor, max = math.floor, math.max
@@ -102,9 +101,6 @@ local function style(self)
 	self.Buffs.initialAnchor = 'TOPRIGHT'
 	self.Buffs['growth-x'] = 'LEFT'
 	self.Buffs['growth-y'] = 'DOWN'
-	self.PostCreateAuraIcon = postCreate
-	self.PostUpdateAuraIcon = postUpdate
-	self.CustomAuraFilter = customFilter
 
 	self.Debuffs = CreateFrame('Frame', nil, UIParent)
 	self.Debuffs:SetPoint('TOPRIGHT', self.Buffs, 'BOTTOMRIGHT', 0, -15)
@@ -115,8 +111,11 @@ local function style(self)
 	self.Debuffs.initialAnchor = 'TOPRIGHT'
 	self.Debuffs['growth-x'] = 'LEFT'
 	self.Debuffs['growth-y'] = 'DOWN'
+
+	self.PreAuraSetPosition = prePosition
 	self.PostCreateAuraIcon = postCreate
 	self.PostUpdateAuraIcon = postUpdate
+	self.CustomAuraFilter = customFilter
 
 	BuffFrame:Hide()
 	BuffFrame:UnregisterEvent('UNIT_AURA')
