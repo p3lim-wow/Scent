@@ -44,7 +44,7 @@ local function postCreate(self, button, icons)
 
 	button:SetBackdrop({bgFile = [=[Interface\ChatFrame\ChatFrameBackground]=], insets = {top = -1, bottom = -1, left = -1, right = -1}})
 	button:SetBackdropColor(0, 0, 0)
-	button.icon:SetTexCoord(0.06, 0.94, 0.06, 0.94)
+	button.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
 	button.icon:SetDrawLayer('ARTWORK')
 	button.overlay:SetTexture()
 
