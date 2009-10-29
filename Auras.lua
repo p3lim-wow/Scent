@@ -25,7 +25,7 @@ local floor, max = math.floor, math.max
 local match, format, gsub = string.match, string.format, string.gsub
 
 local function hookTooltip(self)
-	if(self.owner) then
+	if(self.owner and UnitExists(self.owner)) then
 		if(self.owner == 'vehicle' or self.owner == 'pet') then
 			GameTooltip:AddLine(format('Cast by %s <%s>', UnitName(self.owner), UnitName('player')))
 		elseif(self.owner:match('^partypet[1-4]$')) then
