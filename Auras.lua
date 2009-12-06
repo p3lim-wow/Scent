@@ -59,8 +59,14 @@ local function postCreate(self, button, icons)
 end
 
 local function updateTime(self, elapsed)
-	self.timeLeft = max(self.timeLeft - elapsed, 0)
-	self.time:SetText(self.timeLeft < 90 and floor(self.timeLeft) or '')
+	self.expiration = max(self.expiration - elapsed, 0)
+	if(self.expiration <= 0) then
+		self.expiration = -1
+		self.time:SetText()
+		self:SetScript('OnUpdate', nil)
+	else
+		self.time:SetText(self.expiration < 90 and floor(self.expiration) or '')
+	end
 	
 	if(GameTooltip:IsOwned(self)) then
 		GameTooltip:SetUnitAura(self.frame.unit, self:GetID(), self.filter)
@@ -69,16 +75,7 @@ local function updateTime(self, elapsed)
 end
 
 local function postUpdate(self, icons, unit, icon, index)
-	local _, _, _, _, dtype, duration, expiration = UnitAura(unit, index, icon.filter)
-
-	if(duration and duration > 0 and expiration) then
-		icon.timeLeft = expiration - GetTime()
-		icon:SetScript('OnUpdate', updateTime)
-	else
-		icon.timeLeft = nil
-		icon.time:SetText()
-		icon:SetScript('OnUpdate', nil)
-	end
+	local _, _, _, _, dtype = UnitAura(unit, index, icon.filter)
 
 	if(icon.debuff) then
 		local color = DebuffTypeColor[dtype] or DebuffTypeColor.none
@@ -91,8 +88,33 @@ end
 local function customFilter(icons, unit, icon, name, rank, texture, count, dtype, duration, expiration, owner)
 	if(not (buffFilter[name] and owner == 'player')) then
 		icon.owner = owner
+
+		if(expiration == 0) then
+			icon.time:SetText()
+			icon.expiration = math.huge
+			icon:SetScript('OnUpdate', nil)
+		else
+			icon.expiration = expiration - GetTime()
+			icon:SetScript('OnUpdate', updateTime)
+		end
+
 		return true
 	end
+end
+
+local function sort(a, b)
+	return (a.expiration and a.expiration) > (b.expiration and b.expiration)
+end
+
+local function prePosition(self, auras, max)
+	for index = 1, max do
+		local icon = auras[index]
+		if(not icon:IsShown()) then
+			icon.expiration = -1
+		end
+	end
+
+	table.sort(auras, sort)
 end
 
 local function style(self)
