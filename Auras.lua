@@ -102,21 +102,18 @@ local function filterAura(icons, unit, icon, name, rank, texture, count, dtype, 
 		end
 
 		return true
+	else
+		-- Auras that is filtered out will still count for the sorting function.
+		-- Setting timeLeft on them to inf to avoid nil errors.
+		icon.timeLeft = math.huge
 	end
 end
 
 local function sortAura(a, b)
-	return (a.timeLeft and a.timeLeft) > (b.timeLeft and b.timeLeft)
+	return a.timeLeft > b.timeLeft
 end
 
-local function positionAura(self, auras, max)
-	for index = 1, max do
-		local icon = auras[index]
-		if(not icon:IsShown()) then
-			icon.timeLeft = -1
-		end
-	end
-
+local function positionAura(self, auras)
 	table.sort(auras, sortAura)
 end
 
