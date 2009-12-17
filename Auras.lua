@@ -104,8 +104,7 @@ local function filterAura(icons, unit, icon, name, rank, texture, count, dtype, 
 		return true
 	else
 		-- Auras that is filtered out will still count for the sorting function.
-		-- Setting timeLeft on them to inf to avoid nil errors.
-		icon.timeLeft = math.huge
+		icon.timeLeft = timeLeft
 	end
 end
 
