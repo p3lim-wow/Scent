@@ -44,7 +44,35 @@ local function hookTooltip(self)
 	GameTooltip:Show()
 end
 
-local function postCreate(self, button, icons)
+local function updateTime(self, elapsed)
+	self.timeLeft = max(self.timeLeft - elapsed, 0)
+
+	if(self.timeLeft <= 0) then
+		self.timeLeft = -1
+		self.time:SetText()
+		self:SetScript('OnUpdate', nil)
+	else
+		self.time:SetText(self.timeLeft < 90 and floor(self.timeLeft) or '')
+	end
+	
+	if(GameTooltip:IsOwned(self)) then
+		GameTooltip:SetUnitAura(self.frame.unit, self:GetID(), self.filter)
+		hookTooltip(self)
+	end
+end
+
+local function updateAura(self, icons, unit, icon, index)
+	local _, _, _, _, dtype = UnitAura(unit, index, icon.filter)
+
+	if(icon.debuff) then
+		local color = DebuffTypeColor[dtype] or DebuffTypeColor.none
+		icon:SetBackdropColor(color.r * 0.6, color.g * 0.6, color.b * 0.6)
+	else
+		icon:SetBackdropColor(0, 0, 0)
+	end
+end
+
+local function createAura(self, button, icons)
 	icons.showDebuffType = true
 	icons.disableCooldown = true
 
@@ -60,43 +88,16 @@ local function postCreate(self, button, icons)
 	button:HookScript('OnEnter', hookTooltip)
 end
 
-local function updateTime(self, elapsed)
-	self.expiration = max(self.expiration - elapsed, 0)
-	if(self.expiration <= 0) then
-		self.expiration = -1
-		self.time:SetText()
-		self:SetScript('OnUpdate', nil)
-	else
-		self.time:SetText(self.expiration < 90 and floor(self.expiration) or '')
-	end
-	
-	if(GameTooltip:IsOwned(self)) then
-		GameTooltip:SetUnitAura(self.frame.unit, self:GetID(), self.filter)
-		hookTooltip(self)
-	end
-end
-
-local function postUpdate(self, icons, unit, icon, index)
-	local _, _, _, _, dtype = UnitAura(unit, index, icon.filter)
-
-	if(icon.debuff) then
-		local color = DebuffTypeColor[dtype] or DebuffTypeColor.none
-		icon:SetBackdropColor(color.r * 0.6, color.g * 0.6, color.b * 0.6)
-	else
-		icon:SetBackdropColor(0, 0, 0)
-	end
-end
-
-local function customFilter(icons, unit, icon, name, rank, texture, count, dtype, duration, expiration, owner)
+local function filterAura(icons, unit, icon, name, rank, texture, count, dtype, duration, timeLeft, owner)
 	if(not (buffFilter[name] and owner == 'player')) then
 		icon.owner = owner
 
-		if(expiration == 0) then
+		if(timeLeft == 0) then
 			icon.time:SetText()
-			icon.expiration = math.huge
+			icon.timeLeft = math.huge
 			icon:SetScript('OnUpdate', nil)
 		else
-			icon.expiration = expiration - GetTime()
+			icon.timeLeft = timeLeft - GetTime()
 			icon:SetScript('OnUpdate', updateTime)
 		end
 
@@ -104,19 +105,19 @@ local function customFilter(icons, unit, icon, name, rank, texture, count, dtype
 	end
 end
 
-local function sort(a, b)
-	return (a.expiration and a.expiration) > (b.expiration and b.expiration)
+local function sortAura(a, b)
+	return (a.timeLeft and a.timeLeft) > (b.timeLeft and b.timeLeft)
 end
 
-local function prePosition(self, auras, max)
+local function positionAura(self, auras, max)
 	for index = 1, max do
 		local icon = auras[index]
 		if(not icon:IsShown()) then
-			icon.expiration = -1
+			icon.timeLeft = -1
 		end
 	end
 
-	table.sort(auras, sort)
+	table.sort(auras, sortAura)
 end
 
 local function style(self)
@@ -140,10 +141,10 @@ local function style(self)
 	self.Debuffs['growth-x'] = 'LEFT'
 	self.Debuffs['growth-y'] = 'DOWN'
 
-	self.PreAuraSetPosition = prePosition
-	self.PostCreateAuraIcon = postCreate
-	self.PostUpdateAuraIcon = postUpdate
-	self.CustomAuraFilter = customFilter
+	self.PreAuraSetPosition = positionAura
+	self.PostCreateAuraIcon = createAura
+	self.PostUpdateAuraIcon = updateAura
+	self.CustomAuraFilter = filterAura
 
 	BuffFrame:Hide()
 	BuffFrame:UnregisterEvent('UNIT_AURA')
