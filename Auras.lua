@@ -73,14 +73,12 @@ local function updateAura(self, icons, unit, icon, index)
 end
 
 local function createAura(self, button, icons)
-	icons.showDebuffType = true
 	icons.disableCooldown = true
 
 	button:SetBackdrop({bgFile = [=[Interface\ChatFrame\ChatFrameBackground]=], insets = {top = -1, bottom = -1, left = -1, right = -1}})
 	button:SetBackdropColor(0, 0, 0)
 	button.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
 	button.icon:SetDrawLayer('ARTWORK')
-	button.overlay:SetTexture()
 
 	button.time = button:CreateFontString(nil, 'OVERLAY', 'NumberFontNormal')
 	button.time:SetPoint('TOPLEFT', button)
