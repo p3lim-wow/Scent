@@ -118,24 +118,25 @@ end
 
 local function style(self)
 	self.Buffs = CreateFrame('Frame', nil, UIParent)
-	self.Buffs:SetPoint('TOPRIGHT', Minimap, 'TOPLEFT', -30, 0)
-	self.Buffs:SetHeight(110)
-	self.Buffs:SetWidth(400)
+	self.Buffs:SetPoint('TOPRIGHT', Minimap, 'TOPLEFT', -20, 0)
+	self.Buffs:SetHeight(64)
+	self.Buffs:SetWidth(384)
+	self.Buffs.num = 24
 	self.Buffs.size = 26
-	self.Buffs.spacing = 12
+	self.Buffs.spacing = 6
 	self.Buffs.initialAnchor = 'TOPRIGHT'
 	self.Buffs['growth-x'] = 'LEFT'
 	self.Buffs['growth-y'] = 'DOWN'
 
 	self.Debuffs = CreateFrame('Frame', nil, UIParent)
-	self.Debuffs:SetPoint('TOPRIGHT', self.Buffs, 'BOTTOMRIGHT', 0, -15)
-	self.Debuffs:SetHeight(110)
-	self.Debuffs:SetWidth(400)
+	self.Debuffs:SetPoint('BOTTOMRIGHT', Minimap, 'BOTTOMLEFT', -20, 0)
+	self.Debuffs:SetHeight(64)
+	self.Debuffs:SetWidth(384)
+	self.Debuffs.num = 24
 	self.Debuffs.size = 26
-	self.Debuffs.spacing = 12
-	self.Debuffs.initialAnchor = 'TOPRIGHT'
+	self.Debuffs.spacing = 6
+	self.Debuffs.initialAnchor = 'BOTTOMRIGHT'
 	self.Debuffs['growth-x'] = 'LEFT'
-	self.Debuffs['growth-y'] = 'DOWN'
 
 	self.PreAuraSetPosition = positionAura
 	self.PostCreateAuraIcon = createAura
