@@ -10,17 +10,17 @@
 --]]
 
 local buffFilter = {
-	[GetSpellInfo(52610)] = true, -- Druid: Savage Roar
-	[GetSpellInfo(22812)] = true, -- Druid: Barkskin
-	[GetSpellInfo(16870)] = true, -- Druid: Clearcast
-	[GetSpellInfo(50334)] = true, -- Druid: Berserk
-	[GetSpellInfo(50213)] = true, -- Druid: Tiger's Fury
-	[GetSpellInfo(48517)] = true, -- Druid: Eclipse (Solar)
-	[GetSpellInfo(48518)] = true, -- Druid: Eclipse (Lunar)
-	[GetSpellInfo(57960)] = true, -- Shaman: Water Shield
-	[GetSpellInfo(51566)] = true, -- Shaman: Tidal Waves (Talent)
-	[GetSpellInfo(32182)] = true, -- Shaman: Heroism
-	[GetSpellInfo(49016)] = true, -- Death Knight: Hysteria
+	[52610] = true, -- Druid: Savage Roar
+	[22812] = true, -- Druid: Barkskin
+	[16870] = true, -- Druid: Clearcast
+	[50213] = true, -- Druid: Tiger's Fury
+	[48517] = true, -- Druid: Eclipse (Solar)
+	[48518] = true, -- Druid: Eclipse (Lunar)
+	[57960] = true, -- Shaman: Water Shield
+	[51566] = true, -- Shaman: Tidal Waves (Talent)
+	[32182] = true, -- Shaman: Heroism
+	[49016] = true, -- Death Knight: Hysteria
+	[50334] = true, -- Enchant: Berserk
 }
 
 local floor, max = math.floor, math.max
@@ -86,8 +86,10 @@ local function createAura(self, button, icons)
 	button:HookScript('OnEnter', hookTooltip)
 end
 
-local function filterAura(icons, unit, icon, name, rank, texture, count, dtype, duration, timeLeft, owner)
-	if(not (buffFilter[name] and owner == 'player')) then
+local function filterAura(icons, unit, icon, ...)
+	local _, _, _, _, _, _, timeLeft, owner, _, _, spellid = ...
+
+	if(not (buffFilter[spellid] and owner == 'player')) then
 		icon.owner = owner
 
 		if(timeLeft == 0) then
