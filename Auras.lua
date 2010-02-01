@@ -52,24 +52,20 @@ local function updateTime(self, elapsed)
 	end
 	
 	if(GameTooltip:IsOwned(self)) then
-		GameTooltip:SetUnitAura(self.frame.unit, self:GetID(), self.filter)
+		GameTooltip:SetUnitAura(self.parent:GetParent().unit, self:GetID(), self.filter)
 		hookTooltip(self)
 	end
 end
 
-local function updateAura(self, icons, unit, icon, index)
-	local _, _, _, _, dtype = UnitAura(unit, index, icon.filter)
+local function updateAura(element, unit, button, index)
+	local _, _, _, _, type = UnitAura(unit, index, button.filter)
 
-	if(icon.debuff) then
-		local color = DebuffTypeColor[dtype] or DebuffTypeColor.none
-		icon:SetBackdropColor(color.r * 0.6, color.g * 0.6, color.b * 0.6)
-	else
-		icon:SetBackdropColor(0, 0, 0)
-	end
+	local color = DebuffTypeColor[dtype] or DebuffTypeColor.none
+	button:SetBackdropColor(color.r * 0.6, color.g * 0.6, color.b * 0.6)
 end
 
-local function createAura(self, button, icons)
-	icons.disableCooldown = true
+local function createAura(element, button)
+	element.disableCooldown = true
 
 	button:SetBackdrop({bgFile = [=[Interface\ChatFrame\ChatFrameBackground]=], insets = {top = -1, bottom = -1, left = -1, right = -1}})
 	button:SetBackdropColor(0, 0, 0)
@@ -82,25 +78,25 @@ local function createAura(self, button, icons)
 	button:HookScript('OnEnter', hookTooltip)
 end
 
-local function filterAura(icons, unit, icon, ...)
-	local _, _, _, _, _, _, timeLeft, owner, _, _, spellid = ...
+local function filterAura(element, unit, button, ...)
+	local _, _, _, _, _, _, timeLeft, owner, _, _, spell = ...
 
-	if(not (buffFilter[spellid] and owner == 'player')) then
-		icon.owner = owner
+	if(not (buffFilter[spell] and owner == 'player')) then
+		button.owner = owner
 
 		if(timeLeft == 0) then
-			icon.time:SetText()
-			icon.timeLeft = math.huge
-			icon:SetScript('OnUpdate', nil)
+			button.time:SetText()
+			button.timeLeft = math.huge
+			button:SetScript('OnUpdate', nil)
 		else
-			icon.timeLeft = timeLeft - GetTime()
-			icon:SetScript('OnUpdate', updateTime)
+			button.timeLeft = timeLeft - GetTime()
+			button:SetScript('OnUpdate', updateTime)
 		end
 
 		return true
 	else
 		-- Auras that is filtered out will still count for the sorting function.
-		icon.timeLeft = timeLeft
+		button.timeLeft = timeLeft
 	end
 end
 
@@ -108,8 +104,8 @@ local function sortAura(a, b)
 	return a.timeLeft > b.timeLeft
 end
 
-local function positionAura(self, auras)
-	table.sort(auras, sortAura)
+local function positionAura(element)
+	table.sort(element, sortAura)
 end
 
 local function style(self)
@@ -123,6 +119,9 @@ local function style(self)
 	self.Buffs.initialAnchor = 'TOPRIGHT'
 	self.Buffs['growth-x'] = 'LEFT'
 	self.Buffs['growth-y'] = 'DOWN'
+	self.Buffs.PreSetPosition = positionAura
+	self.Buffs.PostCreateIcon = createAura
+	self.Buffs.CustomFilter = filterAura
 
 	self.Debuffs = CreateFrame('Frame', nil, UIParent)
 	self.Debuffs:SetPoint('BOTTOMRIGHT', Minimap, 'BOTTOMLEFT', -20, 0)
@@ -133,11 +132,9 @@ local function style(self)
 	self.Debuffs.spacing = 6
 	self.Debuffs.initialAnchor = 'BOTTOMRIGHT'
 	self.Debuffs['growth-x'] = 'LEFT'
-
-	self.PreAuraSetPosition = positionAura
-	self.PostCreateAuraIcon = createAura
-	self.PostUpdateAuraIcon = updateAura
-	self.CustomAuraFilter = filterAura
+	self.Debuffs.PreSetPosition = positionAura
+	self.Debuffs.PostCreateIcon = createAura
+	self.Debuffs.PostUpdateAuraIcon = updateAura
 
 	BuffFrame:Hide()
 	BuffFrame:UnregisterEvent('UNIT_AURA')
