@@ -109,7 +109,7 @@ local function positionAura(element)
 end
 
 local function style(self)
-	self.Buffs = CreateFrame('Frame', nil, UIParent)
+	self.Buffs = CreateFrame('Frame', nil, self)
 	self.Buffs:SetPoint('TOPRIGHT', Minimap, 'TOPLEFT', -20, 0)
 	self.Buffs:SetHeight(64)
 	self.Buffs:SetWidth(384)
@@ -121,9 +121,10 @@ local function style(self)
 	self.Buffs['growth-y'] = 'DOWN'
 	self.Buffs.PreSetPosition = positionAura
 	self.Buffs.PostCreateIcon = createAura
+	self.Buffs.PostUpdateAuraIcon = updateAura
 	self.Buffs.CustomFilter = filterAura
 
-	self.Debuffs = CreateFrame('Frame', nil, UIParent)
+	self.Debuffs = CreateFrame('Frame', nil, self)
 	self.Debuffs:SetPoint('BOTTOMRIGHT', Minimap, 'BOTTOMLEFT', -20, 0)
 	self.Debuffs:SetHeight(64)
 	self.Debuffs:SetWidth(384)
@@ -135,6 +136,7 @@ local function style(self)
 	self.Debuffs.PreSetPosition = positionAura
 	self.Debuffs.PostCreateIcon = createAura
 	self.Debuffs.PostUpdateAuraIcon = updateAura
+	self.Debuffs.CustomFilter = filterAura
 
 	BuffFrame:Hide()
 	BuffFrame:UnregisterEvent('UNIT_AURA')
