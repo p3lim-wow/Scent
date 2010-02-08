@@ -9,20 +9,10 @@
 
 --]]
 
-local buffFilter = {
-	[52610] = true, -- Druid: Savage Roar
-	[16870] = true, -- Druid: Clearcast
-	[50213] = true, -- Druid: Tiger's Fury
-	[50334] = true, -- Druid: Berserk
-	[57960] = true, -- Shaman: Water Shield
-	[32182] = true, -- Buff: Heroism
-	[49016] = true, -- Buff: Hysteria
-}
-
 local floor, max = math.floor, math.max
 local match, format, gsub = string.match, string.format, string.gsub
 
-local function hookTooltip(self)
+local function HookTooltip(self)
 	if(self.owner and UnitExists(self.owner)) then
 		if(self.owner == 'vehicle' or self.owner == 'pet') then
 			GameTooltip:AddLine(format('Cast by %s <%s>', UnitName(self.owner), UnitName('player')))
@@ -40,7 +30,7 @@ local function hookTooltip(self)
 	GameTooltip:Show()
 end
 
-local function updateTime(self, elapsed)
+local function OnTimeUpdate(self, elapsed)
 	self.timeLeft = max(self.timeLeft - elapsed, 0)
 
 	if(self.timeLeft <= 0) then
@@ -53,18 +43,18 @@ local function updateTime(self, elapsed)
 	
 	if(GameTooltip:IsOwned(self)) then
 		GameTooltip:SetUnitAura(self.parent:GetParent().unit, self:GetID(), self.filter)
-		hookTooltip(self)
+		HookTooltip(self)
 	end
 end
 
-local function updateAura(element, unit, button, index)
+local function PostUpdate(element, unit, button, index)
 	local _, _, _, _, type = UnitAura(unit, index, button.filter)
 
-	local color = DebuffTypeColor[dtype] or DebuffTypeColor.none
+	local color = DebuffTypeColor[type] or DebuffTypeColor.none
 	button:SetBackdropColor(color.r * 0.6, color.g * 0.6, color.b * 0.6)
 end
 
-local function createAura(element, button)
+local function PostCreate(element, button)
 	element.disableCooldown = true
 
 	button:SetBackdrop({bgFile = [=[Interface\ChatFrame\ChatFrameBackground]=], insets = {top = -1, bottom = -1, left = -1, right = -1}})
@@ -75,37 +65,54 @@ local function createAura(element, button)
 	button.time = button:CreateFontString(nil, 'OVERLAY', 'NumberFontNormal')
 	button.time:SetPoint('TOPLEFT', button)
 
-	button:HookScript('OnEnter', hookTooltip)
+	button:HookScript('OnEnter', HookTooltip)
 end
 
-local function filterAura(element, unit, button, ...)
-	local _, _, _, _, _, _, timeLeft, owner, _, _, spell = ...
+local CustomFilter
+do
+	local spells = {
+		[52610] = true, -- Druid: Savage Roar
+		[16870] = true, -- Druid: Clearcast
+		[50213] = true, -- Druid: Tiger's Fury
+		[50334] = true, -- Druid: Berserk
+		[57960] = true, -- Shaman: Water Shield
+		[70806] = true, -- Shaman: T10 2pc Bonus
+		[32182] = true, -- Buff: Heroism
+		[49016] = true, -- Buff: Hysteria
+	}
 
-	if(not (buffFilter[spell] and owner == 'player')) then
-		button.owner = owner
+	function CustomFilter(element, unit, button, ...)
+		local _, _, _, _, _, _, timeLeft, owner, _, _, spell = ...
 
-		if(timeLeft == 0) then
-			button.time:SetText()
-			button.timeLeft = math.huge
-			button:SetScript('OnUpdate', nil)
+		if(not (spells[spell] and owner == 'player')) then
+			button.owner = owner
+
+			if(timeLeft == 0) then
+				button.time:SetText()
+				button.timeLeft = math.huge
+				button:SetScript('OnUpdate', nil)
+			else
+				button.timeLeft = timeLeft - GetTime()
+				button:SetScript('OnUpdate', OnTimeUpdate)
+			end
+
+			return true
 		else
-			button.timeLeft = timeLeft - GetTime()
-			button:SetScript('OnUpdate', updateTime)
+			-- Auras that is filtered out will still count for the sorting function.
+			button.timeLeft = timeLeft
 		end
-
-		return true
-	else
-		-- Auras that is filtered out will still count for the sorting function.
-		button.timeLeft = timeLeft
 	end
 end
 
-local function sortAura(a, b)
-	return a.timeLeft > b.timeLeft
-end
+local PrePosition
+do
+	local function sort(a, b)
+		return a.timeLeft > b.timeLeft
+	end
 
-local function positionAura(element)
-	table.sort(element, sortAura)
+	function PrePosition(element)
+		table.sort(element, sort)
+	end
 end
 
 local function style(self)
@@ -119,10 +126,9 @@ local function style(self)
 	self.Buffs.initialAnchor = 'TOPRIGHT'
 	self.Buffs['growth-x'] = 'LEFT'
 	self.Buffs['growth-y'] = 'DOWN'
-	self.Buffs.PreSetPosition = positionAura
-	self.Buffs.PostCreateIcon = createAura
-	self.Buffs.PostUpdateAuraIcon = updateAura
-	self.Buffs.CustomFilter = filterAura
+	self.Buffs.PreSetPosition = PrePosition
+	self.Buffs.PostCreateIcon = PostCreate
+	self.Buffs.CustomFilter = CustomFilter
 
 	self.Debuffs = CreateFrame('Frame', nil, self)
 	self.Debuffs:SetPoint('BOTTOMRIGHT', Minimap, 'BOTTOMLEFT', -20, 0)
@@ -133,10 +139,10 @@ local function style(self)
 	self.Debuffs.spacing = 6
 	self.Debuffs.initialAnchor = 'BOTTOMRIGHT'
 	self.Debuffs['growth-x'] = 'LEFT'
-	self.Debuffs.PreSetPosition = positionAura
-	self.Debuffs.PostCreateIcon = createAura
-	self.Debuffs.PostUpdateAuraIcon = updateAura
-	self.Debuffs.CustomFilter = filterAura
+	self.Debuffs.PreSetPosition = PrePosition
+	self.Debuffs.PostCreateIcon = PostCreate
+	self.Debuffs.PostUpdateIcon = PostUpdate
+	self.Debuffs.CustomFilter = CustomFilter
 
 	BuffFrame:Hide()
 	BuffFrame:UnregisterEvent('UNIT_AURA')
