@@ -84,7 +84,7 @@ do
 	function CustomFilter(element, unit, button, ...)
 		local _, _, _, _, _, _, timeLeft, owner, _, _, spell = ...
 
-		if(not (spells[spell] and owner == 'player')) then
+		if(not spells[spell]) then
 			button.owner = owner
 
 			if(timeLeft == 0) then
