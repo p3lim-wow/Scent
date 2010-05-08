@@ -9,19 +9,9 @@
 
 --]]
 
-local floor, max = math.floor, math.max
-local match, format, gsub = string.match, string.format, string.gsub
-
-local function OnTimeUpdate(self, elapsed)
-	self.timeLeft = max(self.timeLeft - elapsed, 0)
-
-	if(self.timeLeft <= 0) then
-		self.timeLeft = -1
-		self.time:SetText()
-		self:SetScript('OnUpdate', nil)
-	else
-		self.time:SetText(self.timeLeft < 90 and floor(self.timeLeft) or '')
-	end
+local function OnUpdate(self, elapsed)
+	self.timeLeft = math.max(self.timeLeft - elapsed, 0)
+	self.time:SetText(self.timeLeft < 90 and math.floor(self.timeLeft) or '')
 	
 	if(GameTooltip:IsOwned(self)) then
 		GameTooltip:SetUnitAura(self.parent:GetParent().unit, self:GetID(), self.filter)
@@ -38,6 +28,7 @@ end
 local function PostCreate(element, button)
 	element.disableCooldown = true
 
+	button:SetScript('OnUpdate', OnUpdate)
 	button:SetBackdrop({bgFile = [=[Interface\ChatFrame\ChatFrameBackground]=], insets = {top = -1, bottom = -1, left = -1, right = -1}})
 	button:SetBackdropColor(0, 0, 0)
 	button.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
@@ -47,38 +38,11 @@ local function PostCreate(element, button)
 	button.time:SetPoint('TOPLEFT', button)
 end
 
-local CustomFilter
-do
-	local spells = {
-		[52610] = true, -- Druid: Savage Roar
-		[16870] = true, -- Druid: Clearcast
-		[50213] = true, -- Druid: Tiger's Fury
-		[50334] = true, -- Druid: Berserk
-		[57960] = true, -- Shaman: Water Shield
-		[70806] = true, -- Shaman: T10 2pc Bonus
-		[32182] = true, -- Buff: Heroism
-		[49016] = true, -- Buff: Hysteria
-	}
+local function CustomFilter(element, unit, button, ...)
+	local _, _, _, _, _, _, timeLeft = ...
+	button.timeLeft = (timeLeft == 0) and math.huge or (timeLeft - GetTime())
 
-	function CustomFilter(element, unit, button, ...)
-		local _, _, _, _, _, _, timeLeft, _, _, _, spell = ...
-
-		if(not spells[spell]) then
-			if(timeLeft == 0) then
-				button.time:SetText()
-				button.timeLeft = math.huge
-				button:SetScript('OnUpdate', nil)
-			else
-				button.timeLeft = timeLeft - GetTime()
-				button:SetScript('OnUpdate', OnTimeUpdate)
-			end
-
-			return true
-		else
-			-- Auras that is filtered out will still count for the sorting function.
-			button.timeLeft = timeLeft
-		end
-	end
+	return true
 end
 
 local PrePosition
