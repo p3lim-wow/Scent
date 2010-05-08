@@ -12,24 +12,6 @@
 local floor, max = math.floor, math.max
 local match, format, gsub = string.match, string.format, string.gsub
 
-local function HookTooltip(self)
-	if(self.owner and UnitExists(self.owner)) then
-		if(self.owner == 'vehicle' or self.owner == 'pet') then
-			GameTooltip:AddLine(format('Cast by %s <%s>', UnitName(self.owner), UnitName('player')))
-		elseif(self.owner:match('^partypet[1-4]$')) then
-			GameTooltip:AddLine(format('Cast by %s <%s>', UnitName(self.owner), UnitName(format('party%d', self.owner:gsub('^partypet(%d)$', '%1')))))
-		elseif(self.owner:match('^raidpet[1-40]$')) then
-			GameTooltip:AddLine(format('Cast by %s <%s>', UnitName(self.owner), UnitName(format('raid%d', self.owner:gsub('^raidpet(%d)$', '%1')))))
-		else
-			GameTooltip:AddLine(format('Cast by %s', UnitName(self.owner)))
-		end
-	else
-		GameTooltip:AddLine(format('Cast by %s', UNKNOWN))
-	end
-
-	GameTooltip:Show()
-end
-
 local function OnTimeUpdate(self, elapsed)
 	self.timeLeft = max(self.timeLeft - elapsed, 0)
 
@@ -43,7 +25,6 @@ local function OnTimeUpdate(self, elapsed)
 	
 	if(GameTooltip:IsOwned(self)) then
 		GameTooltip:SetUnitAura(self.parent:GetParent().unit, self:GetID(), self.filter)
-		HookTooltip(self)
 	end
 end
 
@@ -64,8 +45,6 @@ local function PostCreate(element, button)
 
 	button.time = button:CreateFontString(nil, 'OVERLAY', 'NumberFontNormal')
 	button.time:SetPoint('TOPLEFT', button)
-
-	button:HookScript('OnEnter', HookTooltip)
 end
 
 local CustomFilter
@@ -82,11 +61,9 @@ do
 	}
 
 	function CustomFilter(element, unit, button, ...)
-		local _, _, _, _, _, _, timeLeft, owner, _, _, spell = ...
+		local _, _, _, _, _, _, timeLeft, _, _, _, spell = ...
 
 		if(not spells[spell]) then
-			button.owner = owner
-
 			if(timeLeft == 0) then
 				button.time:SetText()
 				button.timeLeft = math.huge
