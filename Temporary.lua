@@ -1,57 +1,43 @@
---[[
-
-	Copyright (c) 2009 Adrian L Lange <adrianlund@gmail.com>
-	All rights reserved.
-
-	You're allowed to use this addon, free of monetary charge,
-	but you are not allowed to modify, alter, or redistribute
-	this addon without express, written permission of the author.
-
---]]
-
-local function onEvent(self, event, unit)
-	if(unit and unit ~= 'player') then return end
-
-	local main, _, _, off = GetWeaponEnchantInfo()
-	if(self.index == 1 and main) then
-		self.texture:Show()
-	elseif(self.index == 2 and off) then
-		self.texture:Show()
-	else
-		self.texture:Hide()
-	end
-end
-
-local function createBorder(parent, index)
-	local texture = parent:CreateTexture(nil, 'OVERLAY')
-	texture:SetTexture([=[Interface\Buttons\UI-Button-Outline]=])
-	texture:SetVertexColor(1/2, 0, 1/2)
-	texture:SetBlendMode('ADD')
-	texture:SetPoint('TOPRIGHT', parent, 15, 15)
-	texture:SetPoint('BOTTOMLEFT', parent, -15, -15)
-
-	local dummy = CreateFrame('Frame')
-	dummy.index = index
-	dummy.texture = texture
-	dummy:RegisterEvent('UNIT_INVENTORY_CHANGED')
-	dummy:RegisterEvent('PLAYER_LOGIN')
-	dummy:SetScript('OnEvent', onEvent)
-end
-
 do
-	local id = {[16] = 1, [17] = 2}
-	local orig = PaperDollItemSlotButton_OnModifiedClick
-	function PaperDollItemSlotButton_OnModifiedClick(self, button, ...)
-		if(IsShiftKeyDown() and button == 'LeftButton' and id[self:GetID()]) then
-			CancelItemTempEnchantment(id[self:GetID()])
+	local frame = CreateFrame('Button', nil, Minimap)
+	frame:SetPoint('BOTTOMLEFT')
+	frame:SetHeight(10)
+	frame:SetWidth(30)
+	frame:Hide()
+
+	local text = frame:CreateFontString(nil, 'ARTWORK')
+	text:SetAllPoints(frame)
+	text:SetFont([=[Interface\AddOns\oUF_P3lim\media\semplice.ttf]=], 9, 'OUTLINE')
+	text:SetJustifyH('LEFT')
+
+	frame:SetScript('OnUpdate', function(self, elapsed)
+		if(self.elapsed and self.elapsed > 0.5) then
+			local enchant, time = GetWeaponEnchantInfo()
+			if(enchant) then
+				local str, val = SecondsToTimeAbbrev(time / 1000)
+				text:SetFormattedText(str:gsub(' ', ''), val)
+			end
+
+			self.elapsed = 0
 		else
-			orig(self, button, ...)
+			self.elapsed = (self.elapsed or 0) + elapsed
 		end
-	end
+	end)
+
+	frame:SetScript('OnClick', function(self, button)
+		CancelItemTempEnchantment(1)
+	end)
+
+	frame:RegisterEvent('PLAYER_LOGIN')
+	frame:RegisterEvent('UNIT_INVENTORY_CHANGED')
+	frame:SetScript('OnEvent', function(self)
+		if(unit and unit ~= 'player') then return end
+		if(GetWeaponEnchantInfo()) then
+			self:Show()
+		else
+			self:Hide()
+		end
+	end)
+
+	TemporaryEnchantFrame:Hide()
 end
-
-createBorder(CharacterMainHandSlot, 1)
-createBorder(CharacterSecondaryHandSlot, 2)
-
-TemporaryEnchantFrame:Hide()
-TemporaryEnchantFrame:SetScript('OnUpdate', nil)
