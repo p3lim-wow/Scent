@@ -1,17 +1,16 @@
 do
 	local frame = CreateFrame('Button', nil, Minimap)
 	frame:SetPoint('BOTTOMLEFT')
-	frame:SetHeight(10)
-	frame:SetWidth(30)
+	frame:SetSize(10, 30)
 	frame:Hide()
 
 	local text = frame:CreateFontString(nil, 'ARTWORK')
-	text:SetAllPoints(frame)
+	text:SetAllPoints()
 	text:SetFont([=[Interface\AddOns\oUF_P3lim\media\semplice.ttf]=], 9, 'OUTLINE')
 	text:SetJustifyH('LEFT')
 
 	frame:SetScript('OnUpdate', function(self, elapsed)
-		if(self.elapsed and self.elapsed > 0.5) then
+		if(self.elapsed and self.elapsed > 1) then
 			local enchant, time = GetWeaponEnchantInfo()
 			if(enchant) then
 				local str, val = SecondsToTimeAbbrev(time / 1000)
@@ -30,8 +29,9 @@ do
 
 	frame:RegisterEvent('PLAYER_LOGIN')
 	frame:RegisterEvent('UNIT_INVENTORY_CHANGED')
-	frame:SetScript('OnEvent', function(self)
+	frame:SetScript('OnEvent', function(self, event, unit)
 		if(unit and unit ~= 'player') then return end
+
 		if(GetWeaponEnchantInfo()) then
 			self:Show()
 		else
