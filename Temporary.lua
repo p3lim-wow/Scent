@@ -15,7 +15,7 @@ local function CreateTemp(id, point)
 
 	local text = frame:CreateFontString(nil, 'ARTWORK')
 	text:SetAllPoints()
-	text:SetFont([=[Interface\AddOns\oUF_P3lim\media\semplice.ttf]=], 9, 'OUTLINE')
+	text:SetFont([=[Interface\AddOns\Scent\semplice.ttf]=], 9, 'OUTLINE')
 	text:SetJustifyH(point)
 
 	frame:SetScript('OnClick', function() CancelItemTempEnchantment(id) end)
