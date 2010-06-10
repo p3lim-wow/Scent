@@ -50,7 +50,7 @@ local function style(self)
 	self.Buffs:SetPoint('TOPRIGHT', Minimap, 'TOPLEFT', -20, 0)
 	self.Buffs:SetHeight(64)
 	self.Buffs:SetWidth(384)
-	self.Buffs.num = 24
+	self.Buffs.num = 36
 	self.Buffs.size = 26
 	self.Buffs.spacing = 6
 	self.Buffs.initialAnchor = 'TOPRIGHT'
