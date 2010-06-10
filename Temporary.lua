@@ -10,7 +10,7 @@ end
 local function CreateTemp(id, point)
 	local frame = CreateFrame('Button', nil, Minimap)
 	frame:SetPoint('BOTTOM'..point)
-	frame:SetSize(10, 30)
+	frame:SetSize(30, 10)
 	frame:Hide()
 
 	local text = frame:CreateFontString(nil, 'ARTWORK')
