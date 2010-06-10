@@ -1,14 +1,3 @@
---[[
-
-	Copyright (c) 2009 Adrian L Lange <adrianlund@gmail.com>
-	All rights reserved.
-
-	You're allowed to use this addon, free of monetary charge,
-	but you are not allowed to modify, alter, or redistribute
-	this addon without express, written permission of the author.
-
---]]
-
 local function OnUpdate(self, elapsed)
 	self.timeLeft = math.max(self.timeLeft - elapsed, 0)
 	self.time:SetText(self.timeLeft < 90 and math.floor(self.timeLeft) or '')
