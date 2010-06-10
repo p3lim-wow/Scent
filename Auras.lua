@@ -20,7 +20,7 @@ local function PostCreate(element, button)
 	button:SetScript('OnUpdate', OnUpdate)
 	button:SetBackdrop({bgFile = [=[Interface\ChatFrame\ChatFrameBackground]=], insets = {top = -1, bottom = -1, left = -1, right = -1}})
 	button:SetBackdropColor(0, 0, 0)
-	button.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
+	button.icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
 	button.icon:SetDrawLayer('ARTWORK')
 
 	button.time = button:CreateFontString(nil, 'OVERLAY', 'NumberFontNormal')
