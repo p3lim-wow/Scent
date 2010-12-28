@@ -43,9 +43,7 @@ local function ParseAuras(self, event, unit)
 	local secureUnit = SecureButton_GetUnit(self)
 	if(not self:IsShown() or (unit and unit ~= secureUnit)) then return end
 
-	local col = self:GetAttribute('wrapAfter')
-	local row = self:GetAttribute('maxWraps')
-	for index = 1, row * col do
+	for index = 1, 30 do
 		local child = self:GetAttribute('child' .. index)
 		if(child) then
 			UpdateAuras(self, child, secureUnit)
