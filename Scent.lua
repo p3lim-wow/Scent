@@ -60,7 +60,6 @@ local function CreateAuraHeader(filter, ...)
 
 	header:SetAttribute('unit', 'player')
 	header:SetAttribute('sortMethod', 'TIME')
-	header:SetAttribute('sortDirection', '-')
 	header:SetAttribute('template', 'ScentAuraTemplate')
 	header:SetAttribute('filter', filter)
 
