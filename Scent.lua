@@ -2,7 +2,11 @@
 local function UpdateTime(self, elapsed)
 	if(self.expiration) then
 		self.expiration = math.max(self.expiration - elapsed, 0)
-		self.time:SetText(self.expiration < 90 and math.floor(self.expiration) or '')
+		if(self.expiration <= 0 or self.expiration > 90) then
+			self.time:SetText('')
+		else
+			self.time:SetText(math.floor(self.expiration))
+		end
 	end
 end
 
