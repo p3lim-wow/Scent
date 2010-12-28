@@ -39,7 +39,7 @@ local function UpdateAuras(header, button)
 end
 
 local function ParseAuras(self, event, unit)
-	if(not self:IsShown() or (unit and unit ~= SecureButton_GetUnit(self))) then return end
+	if(unit and unit ~= SecureButton_GetUnit(self)) then return end
 
 	for index = 1, 30 do
 		local child = self:GetAttribute('child' .. index)
