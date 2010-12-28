@@ -25,14 +25,14 @@ local function UpdateAuras(header, button, unit)
 		button:SetBackdropColor(0, 0, 0)
 	end
 
-	local name, _, texture, count, dtype, duration, expiration = UnitAura(unit, button:GetID(), header.filter)
+	local name, _, texture, count, dtype, duration, expiration = UnitAura(unit, button:GetID(), header:GetAttribute('filter'))
 	if(name) then
 		button.texture:SetTexture(texture)
 		button.texture:SetTexCoord(0.08, 0.92, 0.08, 0.92)
 		button.count:SetText(count > 1 and count or '')
 		button.expiration = expiration - GetTime()
 
-		if(header.filter == 'HARMFUL') then
+		if(header:GetAttribute('filter') == 'HARMFUL') then
 			local color = DebuffTypeColor[dtype] or DebuffTypeColor.none
 			button:SetBackdropColor(color.r * 3/5, color.g * 3/5, color.b * 3/5)
 		end
@@ -63,7 +63,6 @@ local function CreateAuraHeader(filter, ...)
 	header:SetAttribute('sortDirection', '-')
 	header:SetAttribute('template', 'ScentAuraTemplate')
 	header:SetAttribute('filter', filter)
-	header.filter = filter
 
 	header:SetAttribute('point', 'TOPLEFT')
 	header:SetAttribute('minWidth', 330)
