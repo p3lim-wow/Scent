@@ -76,8 +76,8 @@ local function CreateAuraHeader(filter, ...)
 	return header
 end
 
-ParseAuras(CreateAuraHeader('HELPFUL', 'TOPLEFT', 15, -15))
-ParseAuras(CreateAuraHeader('HARMFUL', 'TOPLEFT', 15, -121))
+ParseAuras(CreateAuraHeader('HELPFUL', 'TOPLEFT', 20, -20))
+ParseAuras(CreateAuraHeader('HARMFUL', 'TOPLEFT', 20, -121))
 
 BuffFrame:UnregisterAllEvents()
 BuffFrame:Hide()
