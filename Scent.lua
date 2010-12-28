@@ -9,7 +9,6 @@ end
 local function UpdateAuras(header, button)
 	if(not button.texture) then
 		button.texture = button:CreateTexture(nil, 'BORDER')
-		button.texture:SetTexCoord(0.08, 0.92, 0.08, 0.92)
 		button.texture:SetAllPoints()
 
 		button.count = button:CreateFontString(nil, 'ARTWORK')
