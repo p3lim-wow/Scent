@@ -28,7 +28,7 @@ local function UpdateAuras(header, button)
 		button:SetBackdropColor(0, 0, 0)
 	end
 
-	local name, _, texture, count, dtype, duration, expiration = UnitAura('player', button:GetID(), header:GetAttribute('filter'))
+	local name, _, texture, count, dtype, duration, expiration = UnitAura(header:GetAttribute('unit'), button:GetID(), header:GetAttribute('filter'))
 	if(name) then
 		button.texture:SetTexture(texture)
 		button.texture:SetTexCoord(0.08, 0.92, 0.08, 0.92)
@@ -43,7 +43,12 @@ local function UpdateAuras(header, button)
 end
 
 local function ParseAuras(self, event, unit)
-	if(unit and unit ~= SecureButton_GetUnit(self)) then return end
+	if(unit) then
+		if(unit ~= PlayerFrame.unit) then return end
+		if(unit ~= self:GetAttribute('unit')) then
+			self:SetAttribute('unit', unit)
+		end
+	end
 
 	for index = 1, 30 do
 		local child = self:GetAttribute('child' .. index)
