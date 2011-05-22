@@ -10,7 +10,7 @@
 			</OnLoad>
 			<OnEnter>
 				GameTooltip:SetOwner(self, 'ANCHOR_BOTTOMLEFT')
-				GameTooltip:SetUnitAura(PlayerFrame.unit, self:GetID(), self:GetAttribute('filter'))
+				GameTooltip:SetUnitAura(self:GetParent():GetAttribute('unit'), self:GetID(), self.filter)
 			</OnEnter>
 			<OnLeave function='GameTooltip_Hide'/>
 		</Scripts>
