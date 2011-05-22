@@ -17,17 +17,12 @@ local function UpdateTime(self, elapsed)
 	end
 end
 
-local function UpdateAuras(self, index)
-	local name, _, texture, count, dtype, duration, expiration = UnitAura(self:GetParent():GetAttribute('unit'), index, self.filter)
+local function UpdateAura(self, index)
+	local name, _, texture, count, dtype, duration, expiration = UnitAura(self:GetParent():GetAttribute('unit'), index, 'HELPFUL')
 	if(name) then
 		self.Texture:SetTexture(texture)
 		self.Count:SetText(count > 1 and count or '')
 		self.expiration = expiration - GetTime()
-
-		if(self.filter == 'HARMFUL') then
-			local color = DebuffTypeColor[dtype or 'none']
-			self:SetBackdropColor(color.r * 3/5, color.g * 3/5, color.b * 3/5)
-		end
 	end
 end
 
@@ -57,39 +52,36 @@ local function InitiateAura(self)
 	self:SetScript('OnAttributeChanged', OnAttributeChanged)
 	self:SetBackdrop(BACKDROP)
 	self:SetBackdropColor(0, 0, 0)
+
+	UpdateAura(self, self:GetID())
 end
 
-local function CreateHeader(filter, ...)
-	local header = CreateFrame('Frame', nil, UIParent, 'SecureAuraHeaderTemplate')
-	header:SetAttribute('template', 'ScentAuraTemplate')
-	header:SetAttribute('unit', 'player')
-	header:SetAttribute('filter', filter)
-	header:SetPoint(...)
 
-	header:SetAttribute('sortMethod', 'TIME')
-	header:SetAttribute('point', 'TOPLEFT')
-	header:SetAttribute('minWidth', 330)
-	header:SetAttribute('minHeight', 99)
-	header:SetAttribute('xOffset', 33)
-	header:SetAttribute('wrapYOffset', -33)
-	header:SetAttribute('wrapAfter', 10)
-	header:SetAttribute('maxWraps', 3)
+local header = CreateFrame('Frame', nil, UIParent, 'SecureAuraHeaderTemplate')
+header:SetAttribute('template', 'ScentAuraTemplate')
+header:SetAttribute('unit', 'player')
+header:SetAttribute('filter', 'HELPFUL')
+header:SetPoint('TOPLEFT', 20, -20)
 
-	RegisterAttributeDriver(header, 'unit', '[vehicleui] vehicle; player')
+header:SetAttribute('sortMethod', 'TIME')
+header:SetAttribute('point', 'TOPLEFT')
+header:SetAttribute('minWidth', 330)
+header:SetAttribute('minHeight', 99)
+header:SetAttribute('xOffset', 33)
+header:SetAttribute('wrapYOffset', -33)
+header:SetAttribute('wrapAfter', 10)
+header:SetAttribute('maxWraps', 3)
 
-	header:Show()
+RegisterAttributeDriver(header, 'unit', '[vehicleui] vehicle; player')
 
-	for index = 1, 30 do
-		local child = self:GetAttribute('child' .. index)
-		if(child) then
-			child.filter = filter
-			InitiateAura(child)
-		end
+header:Show()
+
+for index = 1, 30 do
+	local child = header:GetAttribute('child' .. index)
+	if(child) then
+		InitiateAura(child)
 	end
 end
-
-CreateHeader('HELPFUL', 'TOPLEFT', 20, -20)
-CreateHeader('HARMFUL', 'TOPLEFT', 20, -121)
 
 BuffFrame:UnregisterAllEvents()
 BuffFrame:Hide()
