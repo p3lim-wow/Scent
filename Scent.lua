@@ -75,6 +75,8 @@ local function CreateHeader(filter, ...)
 	header:SetAttribute('wrapAfter', 10)
 	header:SetAttribute('maxWraps', 3)
 
+	RegisterAttributeDriver(header, 'unit', '[vehicleui] vehicle; player')
+
 	header:Show()
 
 	for index = 1, 30 do
