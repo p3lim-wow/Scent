@@ -1,4 +1,3 @@
-
 local FONT = [=[Interface\AddOns\Scent\semplice.ttf]=]
 local BACKDROP = {
 	bgFile = [=[Interface\ChatFrame\ChatFrameBackground]=],
@@ -32,7 +31,7 @@ local function OnAttributeChanged(self, attribute, value)
 	end
 end
 
-local function InitiateAura(self)
+local function SkinAura(self)
 	local Texture = self:CreateTexture(nil, 'BORDER')
 	Texture:SetAllPoints()
 	Texture:SetTexCoord(0.08, 0.92, 0.08, 0.92)
@@ -56,6 +55,11 @@ local function InitiateAura(self)
 	UpdateAura(self, self:GetID())
 end
 
+local function InitiateAura(self, name, value)
+	if(string.match(name, '^child(%d)$')) then
+		SkinAura(value)
+	end
+end
 
 local header = CreateFrame('Frame', nil, UIParent, 'SecureAuraHeaderTemplate')
 header:SetAttribute('template', 'ScentAuraTemplate')
@@ -74,14 +78,8 @@ header:SetAttribute('maxWraps', 3)
 
 RegisterAttributeDriver(header, 'unit', '[vehicleui] vehicle; player')
 
+header:HookScript('OnAttributeChanged', InitiateAura)
 header:Show()
-
-for index = 1, 30 do
-	local child = header:GetAttribute('child' .. index)
-	if(child) then
-		InitiateAura(child)
-	end
-end
 
 BuffFrame:UnregisterAllEvents()
 BuffFrame:Hide()
