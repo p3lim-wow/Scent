@@ -56,7 +56,7 @@ local function SkinAura(self)
 end
 
 local function InitiateAura(self, name, value)
-	if(string.match(name, '^child(%d)$')) then
+	if(string.match(name, '^child')) then
 		SkinAura(value)
 	end
 end
