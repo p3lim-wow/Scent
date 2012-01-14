@@ -4,5 +4,7 @@
 ## Title: Scent
 ## Notes: Replacement for the default buff frames
 
+SecureAuraHeader.lua
+
 Scent.xml
 Scent.lua
