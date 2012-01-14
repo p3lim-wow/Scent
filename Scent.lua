@@ -16,18 +16,32 @@ local function UpdateTime(self, elapsed)
 	end
 end
 
-local function UpdateAura(self, index)
-	local name, _, texture, count, dtype, duration, expiration = UnitAura(self:GetParent():GetAttribute('unit'), index, 'HELPFUL')
-	if(name) then
-		self.Texture:SetTexture(texture)
+local function UpdateAura(self, index, enchant)
+	if(enchant) then
+		self.Texture:SetTexture(GetInventoryItemTexture('player', index))
+
+		local count, expiration = select(((index - 15) * 3) - 2, GetWeaponEnchantInfo()) -- Might throw errors, deal with it later
 		self.Count:SetText(count > 1 and count or '')
 		self.expiration = expiration - GetTime()
+
+		local quality = GetInventoryItemQuality('player', index)
+		local r, g, b = GetItemQualityColor(quality or 1)
+		self:SetBackdropColor(r, g, b)
+	else
+		local name, _, texture, count, dtype, duration, expiration = UnitAura(self:GetParent():GetAttribute('unit'), index, 'HELPFUL')
+		if(name) then
+			self.Texture:SetTexture(texture)
+			self.Count:SetText(count > 1 and count or '')
+			self.expiration = expiration - GetTime()
+		end
 	end
 end
 
 local function OnAttributeChanged(self, attribute, value)
 	if(attribute == 'index') then
 		return UpdateAura(self, value)
+	elseif(attribute == 'target-slot') then
+		return UpdateAura(self, value, true)
 	end
 end
 
@@ -56,7 +70,7 @@ local function SkinAura(self)
 end
 
 local function InitiateAura(self, name, value)
-	if(string.match(name, '^child')) then
+	if(string.match(name, '^child') or string.match(name, '^tempenchant')) then
 		SkinAura(value)
 	end
 end
@@ -66,6 +80,9 @@ header:SetAttribute('template', 'ScentAuraTemplate')
 header:SetAttribute('unit', 'player')
 header:SetAttribute('filter', 'HELPFUL')
 header:SetPoint('TOPLEFT', 20, -20)
+
+header:SetAttribute('includeWeapons', 1)
+header:SetAttribute('weaponTemplate', 'ScentEnchantTemplate')
 
 header:SetAttribute('sortMethod', 'TIME')
 header:SetAttribute('point', 'TOPLEFT')
@@ -80,6 +97,9 @@ RegisterAttributeDriver(header, 'unit', '[vehicleui] vehicle; player')
 
 header:HookScript('OnAttributeChanged', InitiateAura)
 header:Show()
+
+TemporaryEnchantFrame:UnregisterAllEvents()
+TemporaryEnchantFrame:Hide()
 
 BuffFrame:UnregisterAllEvents()
 BuffFrame:Hide()

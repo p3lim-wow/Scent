@@ -15,4 +15,13 @@
 			<OnLeave function='GameTooltip_Hide'/>
 		</Scripts>
 	</Button>
+
+	<Button name='ScentEnchantTemplate' inherits='ScentAuraTemplate' virtual='true'>
+		<Scripts>
+			<OnEnter>
+				GameTooltip:SetOwner(self, 'ANCHOR_BOTTOMLEFT')
+				GameTooltip:SetInventoryItem('player', self:GetID())
+			</OnEnter>
+		</Scripts>
+	</Button>
 </Ui>
