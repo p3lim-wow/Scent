@@ -39,9 +39,9 @@ end
 
 local function OnAttributeChanged(self, attribute, value)
 	if(attribute == 'index') then
-		return UpdateAura(self, value)
+		UpdateAura(self, value)
 	elseif(attribute == 'target-slot') then
-		return UpdateAura(self, value, true)
+		UpdateAura(self, value, true)
 	end
 end
 
@@ -75,13 +75,13 @@ local function InitiateAura(self, name, value)
 	end
 end
 
-local header = CreateFrame('Frame', nil, UIParent, 'SecureAuraHeaderTemplate')
+local header = CreateFrame('Frame', 'Scent', UIParent, 'SecureAuraHeaderTemplate')
 header:SetAttribute('template', 'ScentAuraTemplate')
 header:SetAttribute('unit', 'player')
 header:SetAttribute('filter', 'HELPFUL')
 header:SetPoint('TOPLEFT', 20, -20)
 
-header:SetAttribute('includeWeapons', 1)
+--header:SetAttribute('includeWeapons', 1)
 header:SetAttribute('weaponTemplate', 'ScentEnchantTemplate')
 
 header:SetAttribute('sortMethod', 'TIME')
