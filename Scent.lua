@@ -28,7 +28,7 @@ local function UpdateAura(self, index, enchant)
 		local r, g, b = GetItemQualityColor(quality or 1)
 		self:SetBackdropColor(r, g, b)
 	else
-		local name, __, texture, count, dtype, duration, expiration = UnitAura(self:GetParent():GetAttribute('unit'), index, 'HELPFUL')
+		local name, _, texture, count, dtype, duration, expiration = UnitAura(self:GetParent():GetAttribute('unit'), index, 'HELPFUL')
 		if(name) then
 			self.Texture:SetTexture(texture)
 			self.Count:SetText(count > 1 and count or '')
