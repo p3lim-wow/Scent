@@ -1,6 +1,6 @@
-local FONT = [=[Interface\AddOns\Scent\semplice.ttf]=]
+local FONT = [[Interface\AddOns\Scent\semplice.ttf]]
 local BACKDROP = {
-	bgFile = [=[Interface\ChatFrame\ChatFrameBackground]=],
+	bgFile = [[Interface\ChatFrame\ChatFrameBackground]],
 	insets = {top = -1, bottom = -1, left = -1, right = -1}
 }
 
