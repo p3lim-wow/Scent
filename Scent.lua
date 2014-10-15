@@ -64,6 +64,7 @@ header:SetAttribute('filter', 'HELPFUL')
 header:SetPoint('TOPLEFT', 20, -20)
 
 header:SetAttribute('sortMethod', 'TIME')
+header:SetAttribute('sortDirection', '-')
 header:SetAttribute('point', 'TOPLEFT')
 header:SetAttribute('minWidth', 330)
 header:SetAttribute('minHeight', 99)
