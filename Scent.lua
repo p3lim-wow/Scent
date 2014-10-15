@@ -17,7 +17,7 @@ local function UpdateTime(self, elapsed)
 end
 
 local function UpdateAura(self, index)
-	local name, _, texture, count, _, duration, expiration = UnitAura(self:GetParent():GetAttribute('unit'), index, 'HELPFUL')
+	local name, _, texture, count, _, _, expiration = UnitAura(self:GetParent():GetAttribute('unit'), index, 'HELPFUL')
 	if(name) then
 		self.Texture:SetTexture(texture)
 		self.Count:SetText(count > 1 and count or '')
