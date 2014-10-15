@@ -44,12 +44,12 @@ local function InitiateAura(self, name, Button)
 	Texture:SetTexCoord(0.08, 0.92, 0.08, 0.92)
 	Button.Texture = Texture
 
-	local Count = Button:CreateFontString(nil, 'ARTWORK')
+	local Count = Button:CreateFontString()
 	Count:SetPoint('BOTTOMRIGHT', -1, 1)
 	Count:SetFont(FONT, 8, 'OUTLINEMONOCHROME')
 	Button.Count = Count
 
-	local Duration = Button:CreateFontString(nil, 'ARTWORK')
+	local Duration = Button:CreateFontString()
 	Duration:SetPoint('TOPLEFT', 1, -1)
 	Duration:SetFont(FONT, 8, 'OUTLINEMONOCHROME')
 	Button.Duration = Duration
